@@ -1,0 +1,107 @@
+---
+layout: default
+title: Fuse4X - FAQ
+---
+
+<p>If the question you have isn't answered here, try posting it to the <a href="https://groups.google.com/forum/#!forum/fuse4x">Fuse4X</a> group.</p>
+
+<h1><a name="1._Introductory_Questions"></a>1. Introductory Questions<a href="#1._Introductory_Questions" class="section_anchor"></a></h1>
+
+<p><strong>Q 1.1. What is Fuse4X? Is it the same as FUSE on Linux?</strong></p>
+<p>Fuse4X is software that allows you to write arbitrary file systems as user-space programs. You can think of it as a library for easily developing Mac OS X file systems. Another crude way to look at this would be to think of Fuse4X as something that makes Mac OS X work like a <i>microkernel</i> for the purpose of writing/running file systems. Fuse4X has two major components: an in-kernel loadable file system and a user-space library (<tt>libfuse4x</tt>). The in-kernel file system is specific to Mac OS X and is <strong>not</strong> based on Linux FUSE. (Some of its code is based on the FreeBSD implementation of FUSE.) The user-space library (<tt>libfuse4x</tt>), which provides the developer-visible FUSE API, is based on <a href="http://fuse.sourceforge.net">Linux FUSE</a> but has a few Mac OS X specific extensions and features.</p>
+
+<p><strong>Q 1.2. What is "Fuse4X-x.y.z.pkg"?</strong></p>
+<p>A: Fuse4X-x.y.z.pkg (where x, y, and z constitute the Fuse4X version number) is the installation package containing the official distribution of fundamental Fuse4X software you need to use other software built atop Fuse4X. The core Fuse4X software consists of the following components <strong>when installed</strong> on your system:</p>
+<ul>
+  <li>Fuse4X kernel extension (<tt>/System/Library/Extensions/fuse4x.kext</tt>)</li>
+  <li>Fuse4X C-based libraries (<tt>/usr/local/lib/libfuse4x*.dylib</tt>) and headers (<tt>/usr/local/include/fuse*</tt>)</li>
+  <li><tt>/usr/local/bin/sshfs</tt> application that allows to mount remote folders</li>
+  <li>Fuse4X Objective-C framework (<tt>/Library/Frameworks/Fuse4X.framework</tt>)</li>
+  <li>Utility tools (<tt>/System/Library/Filesystems/fuse4x.fs/Contents/Executables</tt>) for easier distribution update/uninstallation</li>
+<!--  <li>Fuse4X project templates for Xcode (<tt>/Library/Application Support/Developer/Shared/Xcode/Project Templates/Fuse4X</tt>)</li> -->
+</ul>
+
+<p><strong>Q 1.3. I'm experiencing serious problems (fill in details of serious problems here) right after I installed Fuse4X. What can I do?</strong></p>
+<p>A: Circumstantial evidence such as "right after I installed Fuse4X" is unfortunately not enough to go on. To realize why Fuse4X <strong>cannot</strong> cause the kind of problems people sometimes ascribe to it, you need to understand <strong>what</strong> Fuse4X is, and just as importantly, what it's <strong>not</strong>.</p>
+<p>Fuse4X is not an application. It's not a background process. It does not configure, reconfigure, or modify the normal working of OS X by itself. It does not alter settings of any OS X components.</p>
+<p>Fuse4X is a bunch of libraries and headers along with a kernel extension. Developers use Fuse4X APIs to write applications - just like how developers use Apple's Cocoa APIs to write applications. Just as Cocoa is not a user-tangible entity, Fuse4X isn't either.  (As an end user, you don't "run" or "launch" Cocoa, do you?)</p>
+<p>With this context, no matter how convinced you are that "it happened right after/only when you installed Fuse4X", keep in mind that Fuse4X cannot do things such as the following:</p>
+<ul>
+  <li>Affect the display</li>
+  <li>Affect wireless networking</li>
+  <li>Slow down the computer</li>
+  <li>Affect the computer's sleep or hibernate cycles</li>
+  <li>Prevent the computer from booting</li>
+  <li>Affect Finder settings, or any other program's settings</li>
+  <li>Do anything to your computer's firmware</li>
+  <li>Do anything to your computer's optical drive</li>
+  <li>Cause HFS+ corruption or any other non-Fuse4X-based file system's corruption</li>
+  <li>Cause car trouble</li>
+</ul>
+<p>If you remain convinced that your woes are Fuse4X's fault, please provide more information than circumstantial evidence.</p>
+
+<p><strong>Q 1.4. How Fuse4X relates to MacFUSE?</strong></p>
+<p>Fuse4X is a fork of <a href="http://code.google.com/p/macfuse/">MacFUSE</a> started in June 2011. At that time MacFUSE project has been abandoned by the original author, the last release has been made in 2008.</p>
+<p>Both Fuse4X and MacFuse provide similar API. If you are software developer and want to migrate your application from MacFUSE to Fuse4X - just recompile it against Fuse4X.framework. In most cases it is enough. If you have problems during migration, please contact Fuse4X <a href="https://groups.google.com/forum/#!forum/fuse4x">project maillist</a>.</p>
+<p>It is safe to have both Fuse4X and MacFUSE installed on the same computer. They use different names for extensions, libraries.</p>
+
+<h1><a name="2._Install/Uninstall_Questions"></a>2. Install/Uninstall Questions<a href="#2._Install/Uninstall_Questions" class="section_anchor"></a></h1>
+<p><strong>Q 2.1. What is the preferred way to install Fuse4X?</strong></p>
+<p>A: The preferred way is to install the <tt>Fuse4X.pkg</tt> from the latest <tt>Fuse4X-&lt;version&gt;.pkg</tt> available from:</p>
+<p><a href="https://github.com/fuse4x/fuse4x/archives/master">https://github.com/fuse4x/fuse4x/archives/master</a></p>
+<p><strong>Q 2.2. How can I keep Fuse4X up-to-date?</strong></p>
+<p>A: Fuse4X distribution contains tool that automatically checks whether a new version of Fuse4X is available. It periodically run as a background process. In case if there is a new version you'll see a dialog that offer you to choose whether you want to update Fuse4X. You can also run the autoupdater tool manually by <tt>/System/Library/Filesystems/fuse4x.fs/Contents/Executables/autoupdater</tt></p>
+<p><strong>Q 2.3. How can I uninstall Fuse4X?</strong></p>
+<p>A: MacOSX does not provide any convenient uninstaller tool. That is why Fuse4X has a script that completely uninstalls the package. If you want to do it, run
+<pre class="terminal"><span class="prompt">$ </span><span class="input">sudo /System/Library/Filesystems/fuse4x.fs/Contents/Executables/uninstall.sh</span></pre>
+</p>
+<p><strong>Q 2.4. Why installer asks me to reboot my computer? </strong></p>
+<p>Fuse4X installer asks to reboot computer only in case if it was not able to reload the kernel extension. It might happen in case if fuse4x filesystem still in use by some process. You need to "stop" all such processes and the easiest way to do it - reboot the computer.</p>
+<p><strong>Q 2.5. I'm using some software that needs an old/deprecated version of Fuse4X. I don't see that version available from your web site. What to do? </strong></p>
+<p>A: Please don't use old/deprecated versions of Fuse4X. The only "good" version of Fuse4X is the latest one. Older versions become obsolete/unsupported as soon as a new release is out. It's an important goal of Fuse4X to not break existing applications written atop it. Developers are encouraged to test their software against prerelease versions of Fuse4X to help meet this goal.</p>
+
+<h1><a name="3._File_System_Specific_Questions"></a>3. File System Specific Questions<a href="#3._File_System_Specific_Questions" class="section_anchor"></a></h1>
+<p><strong>Q 3.1. I'm using sshfs and changed a file "externally" (not through sshfs/Fuse4X) on the server, but in the sshfs volume, I'm not seeing the changes. In fact, when I copy the file through sshfs, I get the old content, etc.</strong></p>
+<p>A: Fuse4X itself isn't a distributed remote file system! It's a mechanism for building arbitrary file systems. If you change things "externally" to Fuse4X (like, a file on the remote server in the case of sshfs), in general, things need to be done proactively to tell Fuse4X that something has changed, otherwise you'll get such "incorrect" behavior. In particular, sshfs isn't meant to <i>replace</i> things such as NFS, AFP, and SMB - it's meant to be a substitute when you don't have any remote file sharing access to a computer, but you do have sftp access. When you use sshfs, from the server's standpoint, you are just accessing it using sftp. It's not as if the server is going to notify an sshfs client of modifications by other clients.</p>
+<p>To make sshfs (or any other file system) "catch up" better with "remote" changes, there are a few things you can do. You can use the <tt>-o auto_cache</tt> option. This would make Fuse4X purge a file's in-kernel buffer cache if a change in the file's size or modification time is detected.</p>
+<p>A worse way to have this mode of operation (where you can change things remotely at any time) is to disable caching in sshfs (look at the various <tt>-o cache</tt> options in sshfs, in particular, <tt>-o cache=no</tt>). Then, additionally, you need to tell Fuse4X not to cache things on its end too. You can use the <tt>-o nolocalcaches</tt> option, which turns off readaheads, the unified buffer cache, and the pathname resolution cache (all in the kernel). At the cost of some overhead, which could be substantial in certain cases, this will give you the behavior where most requests will have to go to the server and will therefore have more up-to-date information. Note that <tt>auto_cache</tt> is vastly preferred over this approach.</p>
+<p>An example command line for this mode of operation could look like the following:</p>
+<pre class="terminal">
+<span class="prompt">$ </span><span class="input">sshfs user@host:/dir /tmp/ssh -ocache=no -onolocalcaches -ovolname=ssh</span>
+</pre>
+<p>If you are developing a Fuse4X file system and you want to handle such scenarios better within your file system, you should consider mounting your file system with the <tt>auto_cache</tt> option.</p>
+<p>  <strong>Q 3.2. sshfs isn't reporting the correct "disk space" for the remote "volume"? It seems to have 1000GB or some such number hardcoded.</strong></p>
+<p>A: Yes, indeed. Remember that there really isn't an sshfs "volume" per se: sshfs just uses SFTP to provide an apparently local view of a remote <i>directory</i>. SFTP doesn't give you disk usage or availability for such a remote <i>directory</i>, so sshfs doesn't really have a choice but to cook up some value.</p>
+
+<h1><a name="4._Other_Usage_Questions"></a>4. Other Usage Questions<a href="#4._Other_Usage_Questions" class="section_anchor"></a></h1>
+<p><strong>Q 4.1. Why do Fuse4X volumes show up with "server" (or "network volume") icons?</strong></p>
+<p>A: To be precise, by default Fuse4X volumes show up as <i>nonlocal</i> volumes, which the Finder unfortunately treats the same as "servers". It's a good question as to why Fuse4X normally tags its volumes as nonlocal. Some people think that in the case of disk-based file systems, Fuse4X <i>must</i> tag the volume as local. Well, let us see.</p>
+<p>For a vfs to be local on Mac OS X, you need a "real" disk device - a <tt>/dev/disk*</tt> style node. Such a real disk device node in Fuse4X's case is problematic: at mount time, for a local volume, the kernel would <i>itself</i> open the device node and pass it to Fuse4X. In doing so, the kernel would make sure that the device is not currently in use (for one, to disallow multiple mounts of the same device). This happens before control passes to Fuse4X and mounting can proceed. This would have been fine if the entire file system lived in the kernel, but in Fuse4X's case, the user-space file system program would <i>also</i> want to (exclusively) open the disk device.</p>
+<p>Moreover, Disk Arbitration also gets involved in mounting and unmounting "local" volumes - this may be undesirable in some cases.</p>
+<p>Technical reasons aside, there are arguments to justify that all Fuse4X volumes are, in fact, "remote". (The semantics of "local" and "remote" are debatable, but that's another discussion.) As far as the Fuse4X vfs is concerned, any and all volumes are remote in that their backing store lives across the kernel-user boundary, in a program that encapsulates backing store knowledge. Fuse4X doesn't care about where the real backing store is - across the network, in the user program's memory, or on a "local" disk device.</p>
+<p>One way to think of Fuse4X user-space file systems is indeed as "servers" - in the microkernel sense.</p>
+<p>All this said, it <i>is</i> possible to tag a specific mount point as "local" at mount time. If you wish to do so, you can use the <tt>-o local</tt> Fuse4X mount-time option. This has caveats though: the Finder (and the operating system in general) may try to do things differently with local volumes. Some of these different things may not be what you want - for example, you may not want a <tt>.Trashes</tt> directory created on your volume. (It may not even be possible to create that directory in the case of certain file systems.) <strong>Make sure</strong> you read the description of <tt>-o local</tt> on the <a href="/options.html">options</a> page.</p>
+<p><strong>Q 4.2. I mounted a Fuse4X volume but I don't see a volume icon on the Desktop. Why?</strong></p>
+<p>A: Check if the Finder preference for showing mounted servers on the Desktop is enabled. (Also see <strong>Q 4.1</strong> to understand why we are talking about "servers" here.) On Mac OS X "Leopard", this preference is <i>not</i> enabled by default. You can either check if <tt>Finder-&gt;Preferences-&gt;General-&gt;Connected servers</tt> is checked, or you can use the <tt>defaults</tt> command from a shell:</p>
+<pre class="terminal">
+<span class="prompt">$ </span><span class="input">defaults read com.apple.finder ShowMountedServersOnDesktop</span>
+0</pre>
+<p>If the preference is unchecked, you can check it within the GUI or use <tt>defaults</tt> to set its value to 1:</p>
+<pre class="terminal">
+<span class="prompt">$ </span><span class="input">defaults write com.apple.finder ShowMountedServersOnDesktop 1</span>
+</pre>
+<p>Alternatively, you can use the <tt>-o local</tt> Fuse4X mount-time option to tag the volume being mounted as "local", in which case it would show up on the Desktop unless you have disabled "external disks" from showing up on the Desktop.</p>
+<p><strong>Q 4.3. On Mac OS X "Leopard", I mounted a Fuse4X volume but I don't see a volume icon in the Finder's sidebar. I've looked at all relevant Finder preferences, but still nothing. What's happening?</strong></p>
+<p>A: Ah the Finder and its infinite wisdom. On "Leopard", the Finder by default won't show a Fuse4X volume under the "DEVICES" section of the sidebar because the volume isn't "local". The Finder won't show the volume under "SHARED" (even though it's "nonlocal") because it apparently thinks that nonlocal volumes must be of types such as AFP, NFS, SMB, and such. If you really want the volume to show up in the sidebar, you can use the <tt>-o local</tt> Fuse4X mount-time option. Also see <strong>Q 4.1</strong> and <strong>Q 4.2</strong>.</p>
+<p><strong>Q 4.4. I tried to use file system ${whatever} with Fuse4X and I am not happy because of ${whatever else}. What to do?</strong></p>
+<p>A: Fuse4X is like a programming library. Individual Fuse4X file systems (e.g. sshfs) are programs written using that library. The quality and behavior of individual programs - of any kind - can vary wildly, and may or may not be an issue with the underlying library. If you have poor experience with an individual Fuse4X file system, please determine (or help determine) if it's an issue specific to that file system or if it's a general issue with Fuse4X. File systems are complex beasts. Fuse4X does simplify their implementation enormously, but nontrivial user-space file systems can still be complex, and their performance/behavior can depend upon numerous factors besides Fuse4X itself. When in doubt, feel free to post your questions on the <a href="https://groups.google.com/forum/#!forum/fuse4x">fuse4x</a> group.</p>
+<p><strong>Q 4.5. I'm trying to access a Fuse4X volume but I keep getting access/permission denied errors. I'm doing this as root - what's going on? Isn't everything allowed as root?</strong></p>
+<p>A: For several reasons, by default, Fuse4X allows access to a volume <i>only</i> to the user who mounted the volume. All other users, <i>including</i> the superuser is denied access. You can change this behavior if you need to. Refer to the <tt>allow_other</tt> and <tt>allow_root</tt> mount-time options in the <a href="/options.html">options</a> document.</p>
+<p><strong>Q 4.6. Can I enable Spotlight on a Fuse4X file system?</strong></p>
+<p>A: Yes, but by default, Spotlight processes running as root would not be able to access the volume, so you have to use certain mount-time options. See the answer to the previous question.</p>
+<p><strong>Q 4.7. I tried to run <tt>gdb</tt> on an executable residing on a Fuse4X file system but I got an "operation not permitted" error. What's going on?</strong></p>
+<p>A: <tt>gdb</tt> is a setgid executable on Mac OS X (see <tt>/usr/libexec/*gdb*</tt>). Therefore, under Fuse4X's default mode of operation, it won't have access to Fuse4X volumes. See the previous questions.</p>
+<p><strong>Q 4.8. How should I unmount my Fuse4X file system? I can't find the <tt>fusermount</tt> program anywhere.</strong></p>
+<p>A: Just use the standard <tt>umount</tt> command in Mac OS X. You don't need the Linux-specific <tt>fusermount</tt> with Fuse4X.</p>
+<p><strong>Q 4.9. All my file systems are showing up in the Finder as "Fuse4X Volume n (X)" for some number n and some file system type X. What should I do?</strong></p>
+<p>A: Use the <tt>volname</tt> command-line option. See <a href="/options.html">options</a> for details.</p>

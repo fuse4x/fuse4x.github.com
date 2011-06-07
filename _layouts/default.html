@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+   <meta name="author" content="Anatol Pomozov" />
+   <meta name="description" content="Filesystem in userspace implementation for MaxOSX" />
+   <meta name="keywords" content="fuse4x, fuse, filesystem, darwin, macintosh, macosx, sshfs, xnu" />
+   <title>{{ page.title }}</title>
+   <link rel="stylesheet" href="/css/style.css" type="text/css" />
+   <link rel="shortcut icon" href="/images/fuse4x_icon.png" />
+</head>
+<body>
+
+<div id="content">
+<a href="/" id="logo_link"><img src="/images/fuse4x.png" id="logo" height="128" width="128" title="Fuse4X - The Easiest and Fastest Way to Create File Systems for Mac OS X"/></a>
+{{ content }}
+</div>
+
+{% unless site.auto %}
+<script type="text/javascript">
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-171695-10']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+</script>
+{% endunless %}
+</body>
+</html>

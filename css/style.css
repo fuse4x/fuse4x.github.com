@@ -1,0 +1,63 @@
+body {
+  background-color: #E3E3DA;
+}
+
+#content {
+  background-color: #F6F6F2;
+  border-radius: 2em;
+  -moz-border-radius: 2em;
+  margin: 3em;
+  padding: 1.5em;
+  text-align: justify;
+}
+
+#content a {
+  color: blue;
+  border-bottom: 1px dotted #888;
+  text-decoration: none;
+}
+
+.links {
+  padding-top: 2em;
+  line-height: 150%;
+}
+
+img#logo {
+  float: left;
+  padding-right: 2em;
+  padding-bottom: 1em;
+  border: 0;
+}
+
+pre.terminal {
+  background: black;
+  color: white;
+  padding: 1em;
+  font-size: smaller;
+  overflow: auto;
+  font-family: courier;
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+}
+
+pre.terminal span.prompt {
+  font-weight: bold;
+  color: red;
+}
+
+pre.terminal span.input {
+  font-weight: bold;
+  color: #AFA;
+}
+
+tt.mount_option {
+	font-weight: bold;
+	font-size: larger;
+}
+
+img#forkmeribbon {
+  float: right;
+  margin-right: -1.5em; /* it should match #content padding */
+  margin-top: -1.5em;
+  border: 0;
+}
