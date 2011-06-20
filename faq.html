@@ -49,7 +49,8 @@ title: Fuse4X &dash; FAQ
 <p>A: The preferred way is to install the <tt>Fuse4X.pkg</tt> from the latest <tt>Fuse4X-&lt;version&gt;.pkg</tt> available from:</p>
 <p><a href="https://github.com/fuse4x/fuse4x/archives/master">https://github.com/fuse4x/fuse4x/archives/master</a></p>
 <p><strong>Q 2.2. How can I keep Fuse4X up-to-date?</strong></p>
-<p>A: Fuse4X distribution contains tool that automatically checks whether a new version of Fuse4X is available. It periodically run as a background process. In case if there is a new version you'll see a dialog that offer you to choose whether you want to update Fuse4X. You can also run the autoupdater tool manually by <tt>/System/Library/Filesystems/fuse4x.fs/Contents/Executables/autoupdater</tt></p>
+<p>A: Fuse4X distribution contains tool that automatically checks whether a new version of Fuse4X is available. It periodically run as a background process. In case if there is a new version you'll see a dialog that offer you to choose whether you want to update Fuse4X. You can also run the autoupdater tool manually by
+<pre class="terminal"><span class="prompt">$ </span><span class="input">/System/Library/Filesystems/fuse4x.fs/Contents/Executables/autoupdater</span></pre></p>
 <p><strong>Q 2.3. How can I uninstall Fuse4X?</strong></p>
 <p>A: MacOSX does not provide any convenient uninstaller tool. That is why Fuse4X has a script that completely uninstalls the package. If you want to do it, run
 <pre class="terminal"><span class="prompt">$ </span><span class="input">sudo /System/Library/Filesystems/fuse4x.fs/Contents/Executables/uninstall.sh</span></pre>
@@ -60,7 +61,9 @@ title: Fuse4X &dash; FAQ
 <p>A: Please don't use old/deprecated versions of Fuse4X. The only "good" version of Fuse4X is the latest one. Older versions become obsolete/unsupported as soon as a new release is out. It's an important goal of Fuse4X to not break existing applications written atop it. Developers are encouraged to test their software against prerelease versions of Fuse4X to help meet this goal.</p>
 
 <h1><a name="3._File_System_Specific_Questions"></a>3. File System Specific Questions<a href="#3._File_System_Specific_Questions" class="section_anchor"></a></h1>
-<p><strong>Q 3.1. I'm using sshfs and changed a file "externally" (not through sshfs/Fuse4X) on the server, but in the sshfs volume, I'm not seeing the changes. In fact, when I copy the file through sshfs, I get the old content, etc.</strong></p>
+<p><strong>Q 3.1. I just installed Fuse4X. How to mount my ext4/ntfs/fat32/... partition?</strong></p>
+<p>Fisrt thing you should remember that Fuse4X itself does not provide any filesystem, neither ext4 nor ntfs or any other. Fuse4X is a library, is a building block that helps filesystem developers to create filesystem for you. So the short answer is Fuse4X itself cannot mount any of your partitions. See section 3.4 for the list of existion filesystems that might help you.</p>
+<p><strong>Q 3.2. I'm using sshfs and changed a file "externally" (not through sshfs/Fuse4X) on the server, but in the sshfs volume, I'm not seeing the changes. In fact, when I copy the file through sshfs, I get the old content, etc.</strong></p>
 <p>A: Fuse4X itself isn't a distributed remote file system! It's a mechanism for building arbitrary file systems. If you change things "externally" to Fuse4X (like, a file on the remote server in the case of sshfs), in general, things need to be done proactively to tell Fuse4X that something has changed, otherwise you'll get such "incorrect" behavior. In particular, sshfs isn't meant to <i>replace</i> things such as NFS, AFP, and SMB &ndash; it's meant to be a substitute when you don't have any remote file sharing access to a computer, but you do have sftp access. When you use sshfs, from the server's standpoint, you are just accessing it using sftp. It's not as if the server is going to notify an sshfs client of modifications by other clients.</p>
 <p>To make sshfs (or any other file system) "catch up" better with "remote" changes, there are a few things you can do. You can use the <tt>-o auto_cache</tt> option. This would make Fuse4X purge a file's in-kernel buffer cache if a change in the file's size or modification time is detected.</p>
 <p>A worse way to have this mode of operation (where you can change things remotely at any time) is to disable caching in sshfs (look at the various <tt>-o cache</tt> options in sshfs, in particular, <tt>-o cache=no</tt>). Then, additionally, you need to tell Fuse4X not to cache things on its end too. You can use the <tt>-o nolocalcaches</tt> option, which turns off readaheads, the unified buffer cache, and the pathname resolution cache (all in the kernel). At the cost of some overhead, which could be substantial in certain cases, this will give you the behavior where most requests will have to go to the server and will therefore have more up-to-date information. Note that <tt>auto_cache</tt> is vastly preferred over this approach.</p>
@@ -69,8 +72,16 @@ title: Fuse4X &dash; FAQ
 <span class="prompt">$ </span><span class="input">sshfs user@host:/dir /tmp/ssh -ocache=no -onolocalcaches -ovolname=ssh</span>
 </pre>
 <p>If you are developing a Fuse4X file system and you want to handle such scenarios better within your file system, you should consider mounting your file system with the <tt>auto_cache</tt> option.</p>
-<p>  <strong>Q 3.2. sshfs isn't reporting the correct "disk space" for the remote "volume"? It seems to have 1000GB or some such number hardcoded.</strong></p>
+<p><strong>Q 3.3. sshfs isn't reporting the correct "disk space" for the remote "volume"? It seems to have 1000GB or some such number hardcoded.</strong></p>
 <p>A: Yes, indeed. Remember that there really isn't an sshfs "volume" per se: sshfs just uses SFTP to provide an apparently local view of a remote <i>directory</i>. SFTP doesn't give you disk usage or availability for such a remote <i>directory</i>, so sshfs doesn't really have a choice but to cook up some value.</p>
+<p><strong>Q 3.4. Who uses fuse?</strong></p>
+<p>Fuse is a widely known technology that is supported on several platforms (Linux,BSD,MacOSX). There are many filesystems use it, among them:
+<ul>
+  <li><a href="http://sourceforge.net/apps/mediawiki/fuse/index.php?title=FileSystems">A huge list of filesystems</a> at fuse wiki. Any of these filesystems can be compiled with Fuse4X.</li>
+  <li><a href="https://github.com/fuse4x/sshfs">SSHFS for MacOSX</a></li>
+  <li><a href="https://github.com/gerard/ext4fuse">ext4</a></li>
+</ul>
+</p>
 
 <h1><a name="4._Other_Usage_Questions"></a>4. Other Usage Questions<a href="#4._Other_Usage_Questions" class="section_anchor"></a></h1>
 <p><strong>Q 4.1. Why do Fuse4X volumes show up with "server" (or "network volume") icons?</strong></p>
