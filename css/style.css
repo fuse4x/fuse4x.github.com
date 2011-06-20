@@ -17,6 +17,17 @@ body {
   text-decoration: none;
 }
 
+#content a.faqitem, #content a.mount_option {
+  color: black;
+  font-weight: bold;
+  border-bottom: 0;
+}
+
+#content a.mount_option {
+  font-family: monospace;
+  font-size: larger;
+}
+
 .links {
   padding-top: 2em;
   line-height: 150%;
@@ -48,11 +59,6 @@ pre.terminal span.prompt {
 pre.terminal span.input {
   font-weight: bold;
   color: #AFA;
-}
-
-tt.mount_option {
-	font-weight: bold;
-	font-size: larger;
 }
 
 img#forkmeribbon {

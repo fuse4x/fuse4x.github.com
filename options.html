@@ -5,7 +5,7 @@ title: "Fuse4X &ndash; Mount-Time Options: A Brief Guide"
 
 <h2 align="center">Fuse4X Mount-Time Options: A Brief Guide</h2>
 
-&#9899; <tt class="mount_option">allow_other</tt>
+<a name="allow_other" href="#allow_other" class="mount_option">&#9899; allow_other</a>
 <p>By default, Fuse4X limits volume access to the user that mounted the volume. Nobody, not even the superuser, can access another user&#x27;s Fuse4X volume. This blanket denial is a first line of defense against misbehaving (whether inadvertently or otherwise) user-space file systems that could, for one, &quot;hang&quot; system programs. If you do trust a file system or are otherwise confident, you can use <tt>allow_other</tt> to turn the blanket denial off. For example, if you wish to use Spotlight on a Fuse4X volume, you&#x27;ll need to use <tt>allow_other</tt>.</p>
 <p>With <tt>allow_other</tt>, the volume will be accessible normally to all users, but usual permission checks will of course apply. Note that <tt>allow_other</tt> is a privileged option in that it can only be used by either the superuser or by a user belonging to the &quot;Fuse4X Admin&quot; group. When Fuse4X loads in the kernel, it sets this group&#x27;s ID to be that of the <tt>admin</tt> group on Mac OS X. The superuser can view or change this ID through the <tt>sysctl</tt> interface (note that Fuse4X allows you to set any group ID you specify, even those that do not exist):</p>
 <pre class="terminal">
@@ -14,41 +14,41 @@ vfs.generic.fuse4x.tunables.admin_group: 80
 <span class="prompt">$ </span><span class="input">sudo sysctl -w vfs.generic.fuse4x.tunables.admin_group=81 # set</span>
 vfs.generic.fuse4x.tunables.admin_group: 80 -&gt; 81</pre>
 
-<br>&#9899; <tt class="mount_option">allow_recursion</tt>
+<br><a name="allow_recursion" href="#allow_recursion" class="mount_option">&#9899; allow_recursion</a>
 <p>By default, Fuse4X does not allow you to mount a Fuse4X volume on a directory that itself resides on a Fuse4X volume. Such recursion can create interesting unmount-time issues in some cases. Unlike most other Fuse4X restrictions, this is a &quot;soft&quot; check that&#x27;s done only by the mount program. <tt>allow_recursion</tt> disables this restriction.</p>
 
-<br>&#9899; <tt class="mount_option">allow_root</tt>
+<br><a name="allow_root" href="#allow_root" class="mount_option">&#9899; allow_root</a>
 <p>Please read the description for <tt>allow_other</tt> first. <tt>allow_root</tt> is similar, except that the set of &quot;other&quot; users contains only the superuser. You need to be a member of the Fuse4X Admin group to use <tt>allow_root</tt>.</p>
 
-<br>&#9899; <tt class="mount_option">auto_cache</tt>
+<br><a name="auto_cache" href="#auto_cache" class="mount_option">&#9899; auto_cache</a>
 <p>By default, if Fuse4X detects a change in a file&#x27;s size during <tt>getattr()</tt>, it will purge that file&#x27;s buffer cache. When <tt>auto_cache</tt> is enabled,  Fuse4X will additionally detect modification time changes during <tt>getattr()</tt> and <tt>open()</tt> and will automatically purge the buffer cache and/or attributes of the file if necessary. It will also generate the relevant <tt>kqueue</tt> messages. All this is subject to the attribute timeout. That is, up to one purge can occur per attribute timeout window. As long as the user-space file system&#x27;s <tt>getattr()</tt> callback returns up-to-date size and modification time information, this should work as intended. For user-space file systems that wish the kernel to keep up with &quot;remote&quot; changes, this should obviate the need for explicit purging. <tt>auto_cache</tt> is not enabled by default: it&#x27;s opt-in.</p>
 
-<br>&#9899; <tt class="mount_option">auto_xattr</tt>
+<br><a name="auto_xattr" href="#auto_xattr" class="mount_option">&#9899; auto_xattr</a>
 <p>By default, Fuse4X provides a flexible and adaptive mechanism to handle extended attributes (including things such as Finder Info, Resource Forks, and ACLs). It will initially forward extended attributes calls up to the user-space file system. If the latter does not implement extended attribute functions, Fuse4X will remember this and will not forward subsequent calls. It will store extended attributes as Apple Double (<tt>._</tt>) files. If the user-space file system does implement extended attribute functions, it can choose to handle all or only some extended attributes. If there are certain extended attributes that the user-space file system wants Fuse4X (the kernel) to handle through <tt>._</tt> files,  it should return <tt>ENOTSUP</tt> for such attributes. The <tt>auto_xattr</tt> option tells Fuse4X to not bother with sending any extended attributes calls up to user-space, regardless of whether the user-space file system implements the relevant functions or not. With <tt>auto_xattr</tt>, the kernel will /always/ use <tt>._</tt> files.</p>
 
-<br>&#9899; <tt class="mount_option">daemon_timeout=N</tt>, where <tt>N</tt> specifies the timeout in seconds </li></ul>
+<br><a name="daemon_timeout" href="#daemon_timeout" class="mount_option">&#9899; daemon_timeout=N</a>, where <tt>N</tt> specifies the timeout in seconds
 <p>When the kernel sends calls to a user-space file system, the latter must reply within some reasonably short time limit, otherwise those calls, and in turn the application that made those calls, will &quot;hang&quot;. User programs cannot be completely trusted as they could inadvertently or maliciously fail to respond forever. A typical example is when the file system has a bug that has caused it to crash. In this case, the file system will never respond. Another typical example is that of a network operation performed by the file system taking too long. The kernel can&#x27;t tell what is really going on, but it does have to guard against hangs. Such hangs may have limited harmful impact on other operating systems, but they are typically deadly on Mac OS X: many parts of the system, including the Finder, can throw a major fit. Often, end users will fail to see a difference between trivially recoverable hangs and unrecoverable system lockup. Therefore, such defensive measures are imperative on Mac OS X.</p><p>Still, if you want more control, you can tweak things on a per-mount basis. The <tt>daemon_timeout</tt> option lets you specify the aforementioned time limit in seconds. The default timeout is set by the <tt>FUSE_DEFAULT_DAEMON_TIMEOUT</tt> define in <tt>kext/common/fuse_param.h</tt> in the Fuse4X kernel source tree. A good question is regarding what happens when there /is/ a timeout. There are several possibilities. Currently, on Mac OS X &quot;Tiger&quot; (default timeout 30 seconds), you will see an alert dialog asking you to choose between force ejecting the volume immediately, continuing to wait until the next timeout, or continue to wait forever (the latter disables the timeout altogether for the given mount instance). On Mac OS X &quot;Leopard&quot; (default timeout 60 seconds), there is no alert dialog &ndash; the volume will be automatically ejected (data in any open files may be lost). This is because the kernel APIs to show the alert dialog are deprecated in Leopard. There may be more fine-grained and more fault-tolerant behavior in future versions of Fuse4X.</p>
 
-<br>&#9899; <tt class="mount_option">debug</tt>
+<br><a name="debug" href="#debug" class="mount_option">&#9899; debug</a>
 <p>The <tt>debug</tt> (or simply <tt>-d</tt>) option causes the user-space file system daemon to print debugging messages for requests and response. The daemon will also run in foregrounded mode with this option.</p>
 
-<br>&#9899; <tt class="mount_option">default_permissions</tt>
-<br>&#9899; <tt class="mount_option">defer_permissions</tt>
+<br><a name="default_permissions" href="#default_permissions" class="mount_option">&#9899; default_permissions</a>
+<br><a name="defer_permissions" href="#defer_permissions" class="mount_option">&#9899; defer_permissions</a>
 <p>As with extended attributes, Fuse4X provides a flexible and adaptive mechanism for dealing with permission checks. By default, Fuse4X will involve the user-space file system in permission checks by sending it <tt>access</tt> messages (see <tt>access(2)</tt>). If the file system doesn&#x27;t implement the <tt>access</tt> function, Fuse4X will perform permission checks /entirely/ itself based on the attributes of file system objects. The <tt>default_permissions</tt> option also enables this behavior, wherein the kernel will attempt to do the &quot;right thing&quot; based on what it can &quot;see&quot; (the permission bits as reported by the file system). The file system may not always do the right thing itself though &ndash; for example, if the file system retrieves file information from another computer and reports user/group IDs /as is/, the kernel will not see any alien IDs as belonging to the user that mounted the volume. (This can happen if user ID translation is not enabled or sometimes doesn&#x27;t work with sshfs.) The <tt>defer_permissions</tt> (formerly <tt>defer_auth</tt>) option is useful in such cases. It causes Fuse4X to assume that all accesses are allowed &ndash; it will forward all operations to the file system, and it is up to somebody else to eventually allow or deny the operations. In the case of sshfs, it would be the SFTP server eventually making the decision about what to allow or disallow.</p>
 
-<br>&#9899; <tt class="mount_option">direct_io</tt>
+<br><a name="direct_io" href="#direct_io" class="mount_option">&#9899; direct_io</a>
 <p>Some file systems may not know the sizes of files that they provide. This could be because a file&#x27;s content is being streamed so it&#x27;s difficult or impossible to know the &quot;size&quot; of the file. The content could be dynamically changing so it may not make sense to advertise a size at <tt>getattr</tt> time only to find that the size has changed at <tt>read</tt> or <tt>write</tt> time. <tt>procfs</tt> is a good example of a Fuse4X file system with such needs. What these file systems would like is to be able to allow reads and writes without the file size mattering. This isn&#x27;t normally possible in the normal I/O paths in the kernel. In particular, short reads from a user-space file system will be zero filled by Fuse4X. The <tt>direct_io</tt> option causes Fuse4X to use an alternative &quot;direct&quot; I/O path between the kernel and the user-space file system. This path makes the file size irrelevant &ndash; a read will go on until the file system keeps returning data. There is also no automatic zero filling. In particular, as an implementation side effect, the I/O path bypasses the unified buffer cache altogether.</p><p><tt>direct_io</tt> is a rather abnormal mode of operation from Mac OS X&#x27;s standpoint. Unless your file system requires this mode, I wouldn&#x27;t recommend using this option.</p>
 
-<br>&#9899; <tt class="mount_option">extended_security</tt>
+<br><a name="extended_security" href="#extended_security" class="mount_option">&#9899; extended_security</a>
 <p>Fuse4X supports Mac OS X access control lists (ACLs). The <tt>extended_security</tt> option will enable it for a file system. To properly support ACLs, a user-space file system must correctly handle the <tt>com.apple.system.Security</tt> extended attribute. It /is/ possible to get by with storing ACLs in Apple Double (<tt>._</tt>) files, although that wouldn&#x27;t be a very secure implementation of ACLs because such files can be manipulated directly. Still, it would work for experimental purposes.</p>
 
-<br>&#9899; <tt class="mount_option">-f</tt>
+<br><a name="-f" href="#-f" class="mount_option">&#9899; -f</a>
 <p>The <tt>-f</tt> option causes a user-space file system to run in foregrounded mode.</p>
 
-<br>&#9899; <tt class="mount_option">fsid=N</tt>, where <tt>N</tt> is a 24-bit integer (<tt>0</tt> and <tt>0xFFFFFF</tt> <strong>not</strong> valid) </li></ul>
+<br><a name="fsid" href="#fsid" class="mount_option">&#9899; fsid=N</a>, where <tt>N</tt> is a 24-bit integer (<tt>0</tt> and <tt>0xFFFFFF</tt> <strong>not</strong> valid)
 <p>Normally, Fuse4X will use a newly generated file system ID for every mount. This is fine except in a case where you /do/ want the volume, when mounted again, to have a persistent file system ID (think aliases, for example). Since Fuse4X volumes do not have &quot;real&quot; devices backing them, this isn&#x27;t possible without extra help. The <tt>fsid</tt> option is that extra help: you use it to specify a 24-bit number that will be used to generate the file system ID.</p>
 
-<br>&#9899; <tt class="mount_option">fsname=NAME</tt>, where <tt>NAME</tt> is a string </li></ul>
+<br><a name="fsname" href="#fsname" class="mount_option">&#9899; fsname=NAME</a>, where <tt>NAME</tt> is a string
 <p>This option can be used to specify the &quot;file system name&quot;, analogous to the device in the case of a disk-backed &quot;real&quot; file system. For example, the fsname in the following mount information is <tt>sshfs#username@127.0.0.1</tt>.</p>
 <pre class="terminal">
 <span class="prompt">$ </span><span class="input">mount</span>
@@ -57,59 +57,59 @@ sshfs#username@127.0.0.1:/tmp/dir on /private/tmp/ssh (fuse4x, nodev, nosuid, sy
 ...</pre>
 <p>Note that a file system daemon can choose to specify its own fsname and can override (by strategically inserting its argument) a user-provided fsname.</p>
 
-<br>&#9899; <tt class="mount_option">fssubtype=N</tt>, where <tt>N</tt> is an integer </li></ul>
+<br><a name="fssubtype" href="#fssubtype" class="mount_option">&#9899; fssubtype=N</a>, where <tt>N</tt> is an integer
 <p>You can use this option to specify the file system subtype identifier for Fuse4X volume being mounted. The Finder uses this subtype to retrieve the string description (if any) for the file system. The description is what you see next to the <tt>Format:</tt> label in window that you get when you perform a &quot;Get Info&quot; Finder operation on the volume. This only works for subtype-string pairs that are already present in the Fuse4X file system bundle (<tt>fuse4x.fs</tt>) that&#x27;s installed as part of Fuse4X. You can add your own additional mappings to the bundle, or send me an email if you think your file system is useful enough to have an &quot;official&quot; entry.</p>
 
-<br>&#9899; <tt class="mount_option">fstypename=NAME</tt>, where <tt>NAME</tt> is a string </li></ul>
+<br><a name="fstypename" href="#fstypename" class="mount_option">&#9899; fstypename=NAME</a>, where <tt>NAME</tt> is a string
 <p>You can use this option to specify the file system&#x27;s /type/ name. <tt>NAME</tt> can be at most 7 character (and if specified, must be at least one character). This would cause the in-kernel file system type to be <tt>fuse4x_NAME</tt>. That is, the <tt>fuse4x_</tt> prefix will be implied and automatically added by the kernel. Thereafter, a user-space file system that uses this option must name its on-disk file system bundle <tt>fuse4x_NAME.fs</tt>. The Finder and other programs/libraries that look into file system bundles will now look inside this bundle (instead of the usual <tt>fuse4x.fs</tt>) for things such as subtypes and description strings. The <tt>fssubtype=N</tt> option will continue to exist and work. A file system that does not need or use <tt>fssubtypename=NAME</tt> will work as in the past. Please note that this option is doing something the side effects of which cannot be entirely predicted because arbitrary programs can depend on the /true/ file system type &ndash; therefore, the use of this option is subject to a general &quot;this might break things you don&#x27;t know about&quot; warning.</p>
 
-<br>&#9899; <tt class="mount_option">iosize=N</tt>, where N is the I/O size in bytes </li></ul>
+<br><a name="iosize" href="#iosize" class="mount_option">&#9899; iosize=N</a>, where N is the I/O size in bytes
 <p>You can use this option to specify the I/O size Fuse4X should use while accessing the hypothetical storage device corresponding to a Fuse4X volume. The minimum possible I/O size is 512 bytes, whereas the largest is 1MB. The size must also be a power of 2.</p>
 
-<br>&#9899; <tt class="mount_option">jail_symlinks</tt>
+<br><a name="jail_symlinks" href="#jail_symlinks" class="mount_option">&#9899; jail_symlinks</a>
 <p>This option can be used to &quot;jail&quot; symbolic links within the Fuse4X volume itself. If an absolute symbolic link is encountered, Fuse4X will prefix the mount path to it.</p>
 
-<br>&#9899; <tt class="mount_option">local</tt><p>This option marks the volume being mounted as &quot;local&quot;. By default, Fuse4X volumes are marked as &quot;nonlocal&quot;, which technically isn&#x27;t necessarily the same as a &quot;server&quot; or &quot;network&quot; volume, but is treated as such by the Finder in some cases. For example, the Finder may not show &quot;connected servers&quot; on the Desktop or in the sidebar in some cases. If you use this option, you can get around this &quot;limitation&quot;. However, <strong>wait</strong>! Don&#x27;t be too tempted and think <tt>local</tt> is a magic pill that will solve all your problems. In fact, it may mess things up more than you realize. The operating system can be more aggressive in dealing with &quot;local&quot; volumes (a <tt>.Trashes.</tt> directory will be created, for one). You could run into mysterious problems with Disk Arbitration and other system components. I don&#x27;t know (and possibly can&#x27;t know &ndash; Mac OS X isn&#x27;t all open source!) the side effects of using this option. Therefore, treat this as experimental and use with caution. Moreover, please do not file bug reports that involve this option &ndash; reproduce your issue <strong>without</strong> this option and then file a bug report.</p>
+<br><a name="local" href="#local" class="mount_option">&#9899; local</a>
+<p>This option marks the volume being mounted as &quot;local&quot;. By default, Fuse4X volumes are marked as &quot;nonlocal&quot;, which technically isn&#x27;t necessarily the same as a &quot;server&quot; or &quot;network&quot; volume, but is treated as such by the Finder in some cases. For example, the Finder may not show &quot;connected servers&quot; on the Desktop or in the sidebar in some cases. If you use this option, you can get around this &quot;limitation&quot;. However, <strong>wait</strong>! Don&#x27;t be too tempted and think <tt>local</tt> is a magic pill that will solve all your problems. In fact, it may mess things up more than you realize. The operating system can be more aggressive in dealing with &quot;local&quot; volumes (a <tt>.Trashes.</tt> directory will be created, for one). You could run into mysterious problems with Disk Arbitration and other system components. I don&#x27;t know (and possibly can&#x27;t know &ndash; Mac OS X isn&#x27;t all open source!) the side effects of using this option. Therefore, treat this as experimental and use with caution. Moreover, please do not file bug reports that involve this option &ndash; reproduce your issue <strong>without</strong> this option and then file a bug report.</p>
 
-<br>&#9899; <tt class="mount_option">modules=M1[:M2...]</tt>, where Mi is the name of a module to pushed onto the file system stack </li></ul>
+<br><a name="modules" href="#modules" class="mount_option">&#9899; modules=M1[:M2...]</a>, where Mi is the name of a module to pushed onto the file system stack
 <p>The Fuse4X user-space library supports /stackable/ modules &ndash; entire file systems or file system shims that can be stacked atop other file systems or shims. For example, filename character set conversion can be handled through such a module. Custom volume icon support in Fuse4X is handled through the <tt>volicon</tt> module. In fact, the <tt>volicon=PATH</tt> option is a shortcut for <tt>modules=volicon,iconpath=PATH</tt> option combination. Note that each module can have one or more of its own arguments (<tt>volicon</tt> has one option: <tt>iconpath</tt>).</p>
 
-<br>&#9899; <tt class="mount_option">negative_vncache</tt>
+<br><a name="negative_vncache" href="#negative_vncache" class="mount_option">&#9899; negative_vncache</a>
 <p>This option enables negative vnode name caching in the kernel. That is, when a file system object name does not exist, Fuse4X will remember this upon the first lookup of that name. Thereafter, Fuse4X will not call the user-space file system upon subsequent lookups for that name &ndash; until an object of that name does get created. The negative cache is LRU managed by the kernel. This is an optimization. If you have a case where file system objects can appear &quot;outside of Fuse4X&#x27;s knowledge&quot; (say, on a remote server in the case of a Fuse4X-based network file system), then you should NOT enable this option.</p>
 
-<br>&#9899; <tt class="mount_option">noappledouble</tt>
+<br><a name="noappledouble" href="#noappledouble" class="mount_option">&#9899; noappledouble</a>
 <p>This option makes Fuse4X deny all types of access to Apple Double (<tt>._</tt>) files and <tt>.DS_Store</tt> files. Any existing files will become apparently non-existent. New files that match the criteria will be disallowed from being created.</p>
 
-<br>&#9899; <tt class="mount_option">noapplexattr</tt>
+<br><a name="noapplexattr" href="#noapplexattr" class="mount_option">&#9899; noapplexattr</a>
 <p>This option makes Fuse4X deny all types of access to extended attributes that begin with the &quot;com.apple.&quot; prefix. On Mac OS X 10.5.x, this is the preferred option if you wish to disallow entities such as resource forks and Finder information.</p>
 
-<br>&#9899; <tt class="mount_option">nobrowse</tt><p>This marks a volume as non-browsable in that it indicates that the file system is not an appropriate path to user data. The Finder wouldn&#x27;t automatically browse into such a volume.</p>
+<br><a name="nobrowse" href="#nobrowse" class="mount_option">&#9899; nobrowse</a><p>This marks a volume as non-browsable in that it indicates that the file system is not an appropriate path to user data. The Finder wouldn&#x27;t automatically browse into such a volume.</p>
 
-<br>&#9899; <tt class="mount_option">nolocalcaches</tt>
+<br><a name="nolocalcaches" href="#nolocalcaches" class="mount_option">&#9899; nolocalcaches</a>
 <p>The <tt>nolocalcaches</tt> option disables (in the kernel) the unified buffer cache (UBC), vnode name caching, attribute caching, and readaheads. This means the kernel will have to call the user-space file system upon every operation. The purported &quot;benefit&quot; is that the kernel would be able to &quot;pick up&quot; file changes that occur unbeknownst to the kernel. For example, in the case of SSHFS, if a file was changed on the server, Fuse4X has no way of knowing about it &ndash; with <tt>nolocalcaches</tt>, Fuse4X will have no cached information and will be forced to talk to the <tt>sshfs</tt> program. The SSHFS program has its own cache, which you can also disable using the <tt>cache=no</tt> option. If all caching is thus disabled, all operations would end up going to go to the SFTP server, resulting in an /apparently/ up-to-date view of the remote file system. There are major caveats, however. <tt>nolocalcaches</tt> makes the operating system work in an abnormal mode, so the relevant code paths may not have been well tested. The option also creates significant overhead &ndash; file operations could end up being /much/ slower. Besides, since SFTP provides no synchronization or locking, there are no consistency or ordering guarantees if multiple clients write to the same file concurrently. My strong suggestion is to /realize/ that SFTP is merely a utility to access remote data, and not a means of distributed file sharing in the same vein as NFS, AFS, Coda, and so on. Of course, you are welcome to create a true distributed file system based on Fuse4X.</p>
 
-<br>&#9899; <tt class="mount_option">noubc</tt>
+<br><a name="noubc" href="#noubc" class="mount_option">&#9899; noubc</a>
 <p>This turns off the unified buffer cache (UBC) for the entire Fuse4X volume.</p>
 
-<br>&#9899; <tt class="mount_option">novncache</tt>
+<br><a name="novncache" href="#novncache" class="mount_option">&#9899; novncache</a>
 <p>This turns off vnode name caching in the kernel.</p>
 
-<br>&#9899; <tt class="mount_option">ping_diskarb</tt>
-<br>&#9899; <tt class="mount_option">noping_diskarb</tt>
+<br><a name="ping_diskarb" href="#ping_diskarb" class="mount_option">&#9899; ping_diskarb</a>
 <p>Beginning with version 1.0.0, Fuse4X always performs synchronous (foreground) mounting, so there&#x27;s no race between the mounting process finishing and the Finder discovering a Fuse4X volume. On Mac OS X 10.4.x, Fuse4X still needs to tell the Finder that a Fuse4X volume has appeared. The <tt>ping_diskarb</tt> option tells Fuse4X to do that (<tt>ping_diskarb</tt> is enabled by default). The <tt>noping_diskarb</tt> turns the default behavior off. On Mac OS X 10.5.x, both these options are no-ops (they are silently ignored).</p>
 
-<br>&#9899; <tt class="mount_option">quiet</tt>
+<br><a name="quiet" href="#quiet" class="mount_option">&#9899; quiet</a>
 <p>The Fuse4X user-space library ensures at runtime that it is talking to a compatible version of the Fuse4X kernel component. If there is a mismatch, Fuse4X will show an alert dialog and will also send a notification to the Distributed Notification Center. The <tt>quiet</tt> option will suppress any such alert dialogs.</p>
 
-<br>&#9899; <tt class="mount_option">rdonly</tt>
+<br><a name="rdonly" href="#rdonly" class="mount_option">&#9899; rdonly</a>
 <p>The <tt>rdonly</tt> (or simply, <tt>-r</tt>) option can be used to mount a Fuse4X file system in read-only mode.</p>
 
-<br>&#9899; <tt class="mount_option">-s</tt>
+<br><a name="-s" href="#-s" class="mount_option">&#9899; -s</a>
 <p>By default, the Fuse4X user-space library runs a file system in multithreaded mode. You can use the <tt>-s</tt> option to make a user-space file system run in single-threaded mode.</p>
 
-<br>&#9899; <tt class="mount_option">volicon=PATH</tt>, where <tt>PATH</tt> is path to an icon (<tt>.icns</tt>) file </li></ul>
+<br><a name="volicon" href="#volicon" class="mount_option">&#9899; volicon=PATH</a>, where <tt>PATH</tt> is path to an icon (<tt>.icns</tt>) file
 <p>You can use the <tt>volicon</tt> option to specify an icon file that would be used as the Desktop icon for the mounted Fuse4X volume. Fuse4X will then do the needful (simulating Finder information for the root folder, simulating a <tt>/.VolumeIcon.icns</tt> file, etc.) to make the custom volume icon work. Note that Fuse4X uses library-level stacking for this &ndash; it generates a shim file system atop the regular user-space file system, with the shim&#x27;s only purpose being to simulate what&#x27;s necessary for the icon to work. <strong>NB</strong>: the <tt>volicon</tt> argument WILL NOT WORK correctly if you use any other library stack module along with the volicon module. To make custom volume icons work alongside other stack modules, you have to specify the modules and their arguments using the &quot;long form&quot; (<tt>volicon=PATH</tt> is a convenience shortcut).</p>
 
-<br>&#9899; <tt class="mount_option">volname=NAME</tt>, where <tt>NAME</tt> is a string </li></ul>
+<br><a name="volname" href="#volname" class="mount_option">&#9899; volname=NAME</a>, where <tt>NAME</tt> is a string
 <p>You can use the <tt>volname</tt> option to specify a name for the Fuse4X volume being mounted. This is the name that would show up on the Desktop. In the absence of this option, Fuse4X will automatically generate a name that would incorporate the Fuse4X device index and the user-space file system being used. For example, an SSHFS mount might have an automatically assigned name &quot;Fuse4X Volume 0 (sshfs)&quot;.</p> 
  </div>
