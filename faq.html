@@ -114,3 +114,16 @@ title: Fuse4X &ndash; FAQ
 <p>A: Just use the standard <tt>umount</tt> command in Mac OS X. You don't need the Linux-specific <tt>fusermount</tt> with Fuse4X.</p>
 <p><a name="Q.4.9" href="#Q.4.9" class="faqitem">Q 4.9. All my file systems are showing up in the Finder as "Fuse4X Volume n (X)" for some number n and some file system type X. What should I do?</a></p>
 <p>A: Use the <tt>volname</tt> command-line option. See <a href="/options.html">options</a> for details.</p>
+<p><a name="Q.4.10" href="#Q.4.10" class="faqitem">Q 4.10. How to build Fuse4X?</a></p>
+<p>
+<ol>
+	<li>Install all required development tools. You need to have XCode with MacOSX SDK.<br>
+	Additionally you need to have <tt>autotools,iconv,pkg-config</tt> installed. The most easiest way to do it - use a package manager such as <a href="http://macports.org">MacPorts</a> or <a href="http://mxcl.github.com/homebrew/">Homebrew</a>. For macports instructions are following:
+<pre class="terminal">
+<span class="prompt">$ </span><span class="input">sudo port install libtool autoconf gettext pkgconfig</span>
+</pre>
+	</li>
+	<li>Go to the <a href="https://github.com/fuse4x">github page</a> and clone module you are interested in. If you want to build the final *.pkg file - clone all modules.</li>
+	<li>Go to the module directory and run its build script <tt>./build.rb</tt>. It will build the binaries; for a <tt>kext,fuse,sshfs</tt> modules it also install it to the local computer.</li>
+</ol>
+</p>
