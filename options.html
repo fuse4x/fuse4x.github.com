@@ -95,9 +95,6 @@ sshfs#username@127.0.0.1:/tmp/dir on /private/tmp/ssh (fuse4x, nodev, nosuid, sy
 <br><a name="novncache" href="#novncache" class="mount_option">&#9899; novncache</a>
 <p>This turns off vnode name caching in the kernel.</p>
 
-<br><a name="ping_diskarb" href="#ping_diskarb" class="mount_option">&#9899; ping_diskarb</a>
-<p>Beginning with version 1.0.0, Fuse4X always performs synchronous (foreground) mounting, so there&#x27;s no race between the mounting process finishing and the Finder discovering a Fuse4X volume. On Mac OS X 10.4.x, Fuse4X still needs to tell the Finder that a Fuse4X volume has appeared. The <tt>ping_diskarb</tt> option tells Fuse4X to do that (<tt>ping_diskarb</tt> is enabled by default). The <tt>noping_diskarb</tt> turns the default behavior off. On Mac OS X 10.5.x, both these options are no-ops (they are silently ignored).</p>
-
 <br><a name="quiet" href="#quiet" class="mount_option">&#9899; quiet</a>
 <p>The Fuse4X user-space library ensures at runtime that it is talking to a compatible version of the Fuse4X kernel component. If there is a mismatch, Fuse4X will show an alert dialog and will also send a notification to the Distributed Notification Center. The <tt>quiet</tt> option will suppress any such alert dialogs.</p>
 
