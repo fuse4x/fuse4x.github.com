@@ -126,9 +126,9 @@ title: Fuse4X &ndash; FAQ
 	</li>
 	<li>Go to the <a href="https://github.com/fuse4x">github page</a> and clone module you are interested in. If you want to build the final *.pkg file - clone all modules like this:
 <pre class="terminal">
-<span class="prompt">$ </span><span class="input">for p in kext fuse framework support sshfs; do git clone git://github.com/fuse4x/$p.git; done</span>
+<span class="prompt">$ </span><span class="input">for p in kext fuse framework support fuse4x sshfs; do git clone git://github.com/fuse4x/$p.git; done</span>
 </pre>
 </li>
-	<li>Go to the module directory and run its build script <tt>./build.rb</tt>. It will build the binaries; for a <tt>kext,fuse,sshfs</tt> modules it also install the binaries to your local computer. If you want to build the final *.pkg file - run <tt>./build.rb</tt> from fuse4x module, *.pkg file can be found in fuse4x/build directory.</li>
+	<li>Go to the module directory and run its build script <tt>./build.rb</tt>. It builds the binaries; for a <tt>kext,fuse,sshfs</tt> modules it also installs the binaries to your local computer. If you want to build the final *.dmg file - run <tt>./build.rb</tt> from fuse4x module, *.dmg file can be found in fuse4x/build directory.</li>
 </ol>
 </p>
