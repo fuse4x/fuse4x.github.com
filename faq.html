@@ -7,10 +7,10 @@ title: Fuse4X &ndash; FAQ
 
 <h1>1. Introductory Questions</h1>
 <p><a name="Q.1.1" href="#Q.1.1" class="faqitem">Q 1.1. What is Fuse4X? Is it the same as FUSE on Linux?</a></p>
-<p>Fuse4X is software that allows you to write arbitrary file systems as user-space programs. You can think of it as a library for easily developing Mac OS X file systems. Another crude way to look at this would be to think of Fuse4X as something that makes Mac OS X work like a <i>microkernel</i> for the purpose of writing/running file systems. Fuse4X has two major components: an in-kernel loadable file system and a user-space library (<tt>libfuse4x</tt>). The in-kernel file system is specific to Mac OS X and is <strong>not</strong> based on Linux FUSE. (Some of its code is based on the FreeBSD implementation of FUSE.) The user-space library (<tt>libfuse4x</tt>), which provides the developer-visible FUSE API, is based on <a href="http://fuse.sourceforge.net">Linux FUSE</a> but has a few Mac OS X specific extensions and features.</p>
+<p>Fuse4X is software that allows you to write arbitrary file systems as user-space programs. You can think of it as a library for easily developing Mac OS X file systems. Another crude way to look at this would be to think of Fuse4X as something that makes Mac OS X work like a <i>microkernel</i> for the purpose of writing/running file systems. Fuse4X has two major components: an in-kernel loadable file system and a user-space library (<tt>libfuse4x</tt>). The in-kernel file system is specific to Mac OS X and is <strong>not</strong> based on Linux FUSE. (Some of its code is based on the FreeBSD implementation of FUSE.) The user-space library (<tt>libfuse4x</tt>), which provides the developer-visible FUSE API, that is <a href="http://fuse.sourceforge.net">Linux FUSE</a> with a few Mac OS X specific extensions and features.</p>
 
-<p><a name="Q.1.2" href="#Q.1.2" class="faqitem">Q 1.2. What is "Fuse4X-x.y.z.pkg"?</a></p>
-<p>A: Fuse4X-x.y.z.pkg (where x, y, and z constitute the Fuse4X version number) is the installation package containing the official distribution of fundamental Fuse4X software you need to use other software built atop Fuse4X. The core Fuse4X software consists of the following components <strong>when installed</strong> on your system:</p>
+<p><a name="Q.1.2" href="#Q.1.2" class="faqitem">Q 1.2. What is "Fuse4X-x.y.z.dmg"?</a></p>
+<p>A: Fuse4X-x.y.z.dmg (where x, y, and z constitute the Fuse4X version number) is the installation package containing the official distribution of fundamental Fuse4X software you need to use other software built atop Fuse4X. The core Fuse4X software consists of the following components <strong>when installed</strong> on your system:</p>
 <ul>
   <li>Fuse4X kernel extension (<tt>/System/Library/Extensions/fuse4x.kext</tt>)</li>
   <li>Fuse4X C-based libraries (<tt>/usr/local/lib/libfuse4x*.dylib</tt>) and headers (<tt>/usr/local/include/fuse*</tt>)</li>
@@ -45,7 +45,7 @@ title: Fuse4X &ndash; FAQ
 
 <h1>2. Install/Uninstall Questions</h1>
 <p><a name="Q.2.1" href="#Q.2.1" class="faqitem">Q 2.1. What is the preferred way to install Fuse4X?</a></p>
-<p>A: The preferred way is to install the <tt>Fuse4X.pkg</tt> from the latest <tt>Fuse4X-&lt;version&gt;.pkg</tt> available from:</p>
+<p>A: The preferred way is to install the <tt>Fuse4X.pkg</tt> from the latest <tt>Fuse4X-&lt;version&gt;.dmg</tt> available from:</p>
 <p><a href="https://github.com/fuse4x/fuse4x/archives/master">https://github.com/fuse4x/fuse4x/archives/master</a></p>
 <p><a name="Q.2.2" href="#Q.2.2" class="faqitem">Q 2.2. How can I keep Fuse4X up-to-date?</a></p>
 <p>A: Fuse4X distribution contains tool that automatically checks whether a new version of Fuse4X is available. It periodically run as a background process. In case if there is a new version you'll see a dialog that offer you to choose whether you want to update Fuse4X. You can also run the autoupdater tool manually by
@@ -71,8 +71,6 @@ title: Fuse4X &ndash; FAQ
 <span class="prompt">$ </span><span class="input">sshfs user@host:/dir /tmp/ssh -ocache=no -onolocalcaches -ovolname=ssh</span>
 </pre>
 <p>If you are developing a Fuse4X file system and you want to handle such scenarios better within your file system, you should consider mounting your file system with the <tt>auto_cache</tt> option.</p>
-<p><a name="Q.3.3" href="#Q.3.3" class="faqitem">Q 3.3. sshfs isn't reporting the correct "disk space" for the remote "volume"? It seems to have 1000GB or some such number hardcoded.</a></p>
-<p>A: Yes, indeed. Remember that there really isn't an sshfs "volume" per se: sshfs just uses SFTP to provide an apparently local view of a remote <i>directory</i>. SFTP doesn't give you disk usage or availability for such a remote <i>directory</i>, so sshfs doesn't really have a choice but to cook up some value.</p>
 <p><a name="Q.3.4" href="#Q.3.4" class="faqitem">Q 3.4. Who uses fuse?</a></p>
 <p>Fuse is a widely known technology that is supported on several platforms (Linux,BSD,MacOSX). There are many filesystems use it, among them:
 <ul>
@@ -103,14 +101,10 @@ title: Fuse4X &ndash; FAQ
 <p>Alternatively, you can use the <tt>-o local</tt> Fuse4X mount-time option to tag the volume being mounted as "local", in which case it would show up on the Desktop unless you have disabled "external disks" from showing up on the Desktop.</p>
 <p><a name="Q.4.3" href="#Q.4.3" class="faqitem">Q 4.3. On Mac OS X "Leopard", I mounted a Fuse4X volume but I don't see a volume icon in the Finder's sidebar. I've looked at all relevant Finder preferences, but still nothing. What's happening?</a></p>
 <p>A: Ah the Finder and its infinite wisdom. On "Leopard", the Finder by default won't show a Fuse4X volume under the "DEVICES" section of the sidebar because the volume isn't "local". The Finder won't show the volume under "SHARED" (even though it's "nonlocal") because it apparently thinks that nonlocal volumes must be of types such as AFP, NFS, SMB, and such. If you really want the volume to show up in the sidebar, you can use the <tt>-o local</tt> Fuse4X mount-time option. Also see <strong>Q 4.1</strong> and <strong>Q 4.2</strong>.</p>
-<p><a name="Q.4.4" href="#Q.4.4" class="faqitem">Q 4.4. I tried to use file system ${whatever} with Fuse4X and I am not happy because of ${whatever else}. What to do?</a></p>
-<p>A: Fuse4X is like a programming library. Individual Fuse4X file systems (e.g. sshfs) are programs written using that library. The quality and behavior of individual programs &ndash; of any kind &ndash; can vary wildly, and may or may not be an issue with the underlying library. If you have poor experience with an individual Fuse4X file system, please determine (or help determine) if it's an issue specific to that file system or if it's a general issue with Fuse4X. File systems are complex beasts. Fuse4X does simplify their implementation enormously, but nontrivial user-space file systems can still be complex, and their performance/behavior can depend upon numerous factors besides Fuse4X itself. When in doubt, feel free to post your questions on the <a href="https://groups.google.com/forum/#!forum/fuse4x">fuse4x</a> group.</p>
 <p><a name="Q.4.5" href="#Q.4.5" class="faqitem">Q 4.5. I'm trying to access a Fuse4X volume but I keep getting access/permission denied errors. I'm doing this as root &ndash; what's going on? Isn't everything allowed as root?</a></p>
 <p>A: For several reasons, by default, Fuse4X allows access to a volume <i>only</i> to the user who mounted the volume. All other users, <i>including</i> the superuser is denied access. You can change this behavior if you need to. Refer to the <tt>allow_other</tt> and <tt>allow_root</tt> mount-time options in the <a href="/options.html">options</a> document.</p>
 <p><a name="Q.4.6" href="#Q.4.6" class="faqitem">Q 4.6. Can I enable Spotlight on a Fuse4X file system?</a></p>
 <p>A: Yes, but by default, Spotlight processes running as root would not be able to access the volume, so you have to use certain mount-time options. See the answer to the previous question.</p>
-<p><a name="Q.4.7" href="#Q.4.7" class="faqitem">Q 4.7. I tried to run <tt>gdb</tt> on an executable residing on a Fuse4X file system but I got an "operation not permitted" error. What's going on?</a></p>
-<p>A: <tt>gdb</tt> is a setgid executable on Mac OS X (see <tt>/usr/libexec/*gdb*</tt>). Therefore, under Fuse4X's default mode of operation, it won't have access to Fuse4X volumes. See the previous questions.</p>
 <p><a name="Q.4.8" href="#Q.4.8" class="faqitem">Q 4.8. How should I unmount my Fuse4X file system? I can't find the <tt>fusermount</tt> program anywhere.</a></p>
 <p>A: Just use the standard <tt>umount</tt> command in Mac OS X. You don't need the Linux-specific <tt>fusermount</tt> with Fuse4X.</p>
 <p><a name="Q.4.9" href="#Q.4.9" class="faqitem">Q 4.9. All my file systems are showing up in the Finder as "Fuse4X Volume n (X)" for some number n and some file system type X. What should I do?</a></p>
@@ -119,9 +113,9 @@ title: Fuse4X &ndash; FAQ
 <p>
 <ol>
 	<li>Install all required development tools. You need to have XCode with MacOSX SDK.<br>
-	Additionally you need to have <tt>autotools,iconv,pkg-config</tt> installed. The most easiest way to do it - use a package manager such as <a href="http://macports.org">MacPorts</a> or <a href="http://mxcl.github.com/homebrew/">Homebrew</a>. For macports instructions are following:
+	Additionally you need to have <tt>autotools,gettext,iconv,pkg-config</tt> installed. The most easiest way to do it - use a package manager such as <a href="http://macports.org">MacPorts</a> or <a href="http://mxcl.github.com/homebrew/">Homebrew</a>. For macports instructions are following:
 <pre class="terminal">
-<span class="prompt">$ </span><span class="input">sudo port install libtool autoconf gettext pkgconfig</span>
+<span class="prompt">$ </span><span class="input">sudo port install libtool autoconf automake gettext pkgconfig libiconv</span>
 </pre>
 	</li>
 	<li>Go to the <a href="https://github.com/fuse4x">github page</a> and clone module you are interested in. If you want to build the final *.pkg file - clone all modules like this:
