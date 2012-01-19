@@ -58,6 +58,31 @@ title: Fuse4X &ndash; FAQ
 <p>Fuse4X installer asks to reboot computer only in case if it was not able to reload the kernel extension. It might happen in case if fuse4x filesystem still in use by some process. You need to "stop" all such processes and the easiest way to do it &ndash; reboot the computer.</p>
 <p><a name="Q.2.5" href="#Q.2.5" class="faqitem">Q 2.5. I'm using some software that needs an old/deprecated version of Fuse4X. I don't see that version available from your web site. What to do?</a></p>
 <p>A: Please don't use old/deprecated versions of Fuse4X. The only "good" version of Fuse4X is the latest one. Older versions become obsolete/unsupported as soon as a new release is out. It's an important goal of Fuse4X to not break existing applications written atop it. Developers are encouraged to test their software against prerelease versions of Fuse4X to help meet this goal.</p>
+<p><a name="Q.2.6" href="#Q.2.6" class="faqitem">Q 2.6. I've upgraded fuse4x and when try to use a filesystem (e.g. sshfs) I have "client library version is incompatible with the kernel extension" error</a></p>
+<p>This message means that user-space library does not match running fuse4x kernel extension. Sometimes the easiest way to fix this issue is to restart your computer. In this case all kernel extensions will be unloaded and the correct one will be loaded next time.
+
+If you don't want to restart you computer then you need to unload the currently running kernel extension manually.
+
+<pre class="terminal">
+<span class="prompt">$ </span><span class="input">sudo kextunload -b org.fuse4x.kext.fuse4x</span>
+<span class="prompt">$ </span><span class="input">kextstat -l -b org.fuse4x.kext.fuse4x</span>
+</pre>
+
+If the second command shows a record it means that kext was not unloaded. It usually happens when it is still in use by some filesystems. Let's find such filesystems:
+
+<pre class="terminal">
+<span class="prompt">$ </span><span class="input">mount -t fuse4x</span>
+</pre>
+
+It gives you a list of filesystems that still use it. You need to unmount all of them by using "umount" command:
+
+<pre class="terminal">
+<span class="prompt">$ </span><span class="input">umount FS_DIRECTORY</span>
+</pre>
+
+And then unload the kernel extension one more time.
+
+</p>
 
 <h1>3. File System Specific Questions</h1>
 <p><a name="Q.3.1" href="#Q.3.1" class="faqitem">Q 3.1. I just installed Fuse4X. How to mount my ext4/ntfs/fat32/... partition?</a></p>
